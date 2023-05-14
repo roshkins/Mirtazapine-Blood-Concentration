@@ -133,7 +133,7 @@
             D1 = document.getElementById("D1").value;
             D2 = document.getElementById("D2").value.split(",").map(Number);
             Vd = document.getElementById("Vd").value;
-            ke = document.getElementById("ke").value;
+            ke = 1/document.getElementById("ke").value;
             tau = document.getElementById("tau").value;
             R = document.getElementById("R").value;
 
@@ -161,8 +161,8 @@
         <input type="text" id="D2" name="D2" value="15, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5"><br>
         <label for="Vd">Volume of distribution (L):</label><br>
         <input type="number" id="Vd" name="Vd" value="1400"><br>
-        <label for="ke">Elimination rate constant (h^-1):</label><br>
-        <input type="number" id="ke" name="ke" value="0.0231"><br>
+        <label for="ke">Half life of drug (20-40 hours for Mirtazapine):</label><br>
+        <input type="number" id="ke" name="ke" value="40"><br>
         <label for="tau">Dosing interval (h):</label><br>
         <input type="number" id="tau" name="tau" value="24"><br>
         <label for="R">Accumulation ratio:</label><br>
