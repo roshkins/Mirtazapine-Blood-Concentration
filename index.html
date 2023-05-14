@@ -133,7 +133,7 @@
             D1 = document.getElementById("D1").value;
             D2 = document.getElementById("D2").value.split(",").map(Number);
             Vd = document.getElementById("Vd").value;
-            ke = 1/document.getElementById("ke").value;
+            ke = Math.LN2/document.getElementById("ke").value;
             tau = document.getElementById("tau").value;
             R = document.getElementById("R").value;
 
@@ -158,11 +158,11 @@
         <label for="D1">Dose for regimen 1 (mg):</label><br>
         <input type="number" id="D1" name="D1" value="15"><br>
         <label for="D2">Doses for regimen 2 (mg):</label><br>
-        <input type="text" id="D2" name="D2" value="15, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5"><br>
+        <input type="text" id="D2" name="D2" value="22.5, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5"><br>
         <label for="Vd">Volume of distribution (L):</label><br>
         <input type="number" id="Vd" name="Vd" value="1400"><br>
         <label for="ke">Half life of drug (20-40 hours for Mirtazapine):</label><br>
-        <input type="number" id="ke" name="ke" value="40"><br>
+        <input type="number" id="ke" name="ke" value="30"><br>
         <label for="tau">Dosing interval (h):</label><br>
         <input type="number" id="tau" name="tau" value="24"><br>
         <label for="R">Accumulation ratio:</label><br>
