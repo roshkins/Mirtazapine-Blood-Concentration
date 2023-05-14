@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Blood concentration of mirtazapine over time</title>
+    <!-- Load the Plotly library -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+    <!-- Create a div element to display the plot -->
+    <div id="plot" style="width: 80%;"></div>
+    <!-- Define the parameters -->
+    <script>
+        var F = 0.5; // bioavailability fraction
+        var D1 = 15; // dose for regimen 1 (mg)
+        var D2 = [15, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5]; // doses for regimen 2 (mg)
+        var Vd = 1400; // volume of distribution (L)
+        var ke = 0.0231; // elimination rate constant (h^-1)
+        var tau = 24; // dosing interval (h)
+        var R = 2.08; // accumulation ratio
+    </script>
+    <!-- Define a function to calculate the blood concentration at any time t for regimen 1 -->
+    <script>
+        function C1(t) {
+            // Calculate the number of doses taken before time t
+            var n = Math.floor(t / tau);
+            // Calculate the time elapsed since the last dose
+            var dt = t - n * tau;
+            // Initialize the blood concentration
+            var C = 0;
+            // Loop over each dose taken and add its contribution to the blood concentration
+            for (var i = 0; i <= n; i++) {
+                // Calculate the time elapsed since the ith dose
+                var ti = t - i * tau;
+                // Calculate the contribution of the ith dose using the equation
+                var Ci = (F * D1 / Vd) * R * Math.exp(-ke * ti);
+                // Add the contribution to the blood concentration
+                C += Ci;
+            }
+            // Return the blood concentration
+            return C;
+        }
+    </script>
+    <!-- Define a function to calculate the blood concentration at any time t for regimen 2 -->
+    <script>
+        function C2(t) {
+            // Calculate the number of doses taken before time t
+            var n = Math.floor(t / tau);
+            // Calculate the time elapsed since the last dose
+            var dt = t - n * tau;
+            // Initialize the blood concentration
+            var C = 0;
+            // Loop over each dose taken and add its contribution to the blood concentration
+            for (var i = 0; i <= n; i++) {
+                // Calculate the time elapsed since the ith dose
+                var ti = t - i * tau;
+                // Calculate the dose for the ith interval
+                var D = D2[i % D2.length];
+                // Calculate the contribution of the ith dose using the equation
+                var Ci = (F * D / Vd) * R * Math.exp(-ke * ti);
+                // Add the contribution to the blood concentration
+                C += Ci;
+            }
+            // Return the blood concentration
+            return C;
+        }
+    </script>
+    <!-- Define an array of time points to plot (from 0 to 240 hours with a step of 1 hour) -->
+    <script>
+        var times = [];
+        for (var i = 0; i <= 480; i++) {
+            times.push(i);
+        }
+    </script>
+    <!-- Define an array of blood concentrations corresponding to the time points for regimen 1 -->
+    <script>
+        var concentrations1 = [];
+        for (var i = 0; i < times.length; i++) {
+            concentrations1.push(C1(times[i]));
+        }
+    </script>
+    <!-- Define an array of blood concentrations corresponding to the time points for regimen 2 -->
+    <script>
+        var concentrations2 = [];
+        for (var i = 0; i < times.length; i++) {
+            concentrations2.push(C2(times[i]));
+        }
+    </script>
+    <!-- Define the data and layout for the plot -->
+    <script>
+        var data = [
+            {
+                x: times,
+                y: concentrations1,
+                type: "scatter",
+                name: "Regimen 1",
+                line: { color: "blue" },
+            },
+            {
+                x: times,
+                y: concentrations2,
+                type: "scatter",
+                name: "Regimen 2",
+                line: { color: "red" },
+            },
+        ];
+
+        var layout = {
+            title: "Blood concentration of mirtazapine over time",
+            xaxis: { title: "Time (h)" },
+            yaxis: { title: "Concentration (mg/L)" },
+            legend: {
+                orientation: "h", // horizontal orientation
+                x: 0.5, // center x position
+                y: -0.1, // below y position
+                xanchor: "center", // center x alignment
+                yanchor: "top", // top y alignment
+            },
+        };
+    </script>
+    <!-- Plot the data using Plotly -->
+    <script>
+        var plot = Plotly.newPlot("plot", data, layout);
+    </script>
+
+    <!-- function to update values from input -->
+    <script>
+        function update() {
+            // get values from input
+            F = document.getElementById("F").value;
+            D1 = document.getElementById("D1").value;
+            D2 = document.getElementById("D2").value.split(",").map(Number);
+            Vd = document.getElementById("Vd").value;
+            ke = document.getElementById("ke").value;
+            tau = document.getElementById("tau").value;
+            R = document.getElementById("R").value;
+
+            // update concentrations
+            for (var i = 0; i < times.length; i++) {
+                concentrations1[i] = C1(times[i]);
+                concentrations2[i] = C2(times[i]);
+            }
+
+            // update data
+            data[0].y = concentrations1;
+            data[1].y = concentrations2;
+
+            // update plot
+            Plotly.redraw("plot");
+        }
+    </script>
+    <!-- Add form boxes and controls to modify the plot -->
+    <form oninput="update()">
+        <label for="F">Bioavailability fraction:</label><br>
+        <input type="number" id="F" name="F" value="0.5"><br>
+        <label for="D1">Dose for regimen 1 (mg):</label><br>
+        <input type="number" id="D1" name="D1" value="15"><br>
+        <label for="D2">Doses for regimen 2 (mg):</label><br>
+        <input type="text" id="D2" name="D2" value="15, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5"><br>
+        <label for="Vd">Volume of distribution (L):</label><br>
+        <input type="number" id="Vd" name="Vd" value="1400"><br>
+        <label for="ke">Elimination rate constant (h^-1):</label><br>
+        <input type="number" id="ke" name="ke" value="0.0231"><br>
+        <label for="tau">Dosing interval (h):</label><br>
+        <input type="number" id="tau" name="tau" value="24"><br>
+        <label for="R">Accumulation ratio:</label><br>
+        <input type="number" id="R" name="R" value="2.08"><br><br>
+    </form>
+
+</body>
+
+</html>
