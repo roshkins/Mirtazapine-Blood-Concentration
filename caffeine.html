@@ -1,0 +1,128 @@
+<html>
+<head>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <a href="caffeine.html">Try dosing caffeine while approximating tolerance</a>
+    <a href="caffeine_dosing.html">Try dosing caffeine while approximating tolerance and accumulation</a>
+
+  <h1>Caffeine Dose Calculator</h1>
+  <p>Enter the parameters below and click the button to see the chart of caffeine plasma concentration adjusted for tolerance over time.</p>
+  <form id="form">
+    <label for="ctarget">Target plasma concentration of caffeine (mg/L):</label>
+    <input type="number" id="ctarget" name="ctarget" value="10"><br>
+    <label for="cinitial">Initial plasma concentration of caffeine (mg/L):</label>
+    <input type="number" id="cinitial" name="cinitial" value="0"><br>
+    <label for="vd">Volume of distribution of caffeine (L/kg):</label>
+    <input type="number" id="vd" name="vd" value="0.67"><br>
+    <label for="f">Bioavailability of caffeine (fraction):</label>
+    <input type="number" id="f" name="f" value="1"><br>
+    <label for="cl">Clearance rate of caffeine (L/h):</label>
+    <input type="number" id="cl" name="cl" value="0.5"><br>
+    <label for="ke">Elimination rate constant of caffeine (1/h):</label>
+    <input type="number" id="ke" name="ke" value="0.2"><br>
+    <label for="kt">Tolerance rate constant of caffeine (1/h):</label>
+    <input type="number" id="kt" name="kt" value="0.01"><br>
+    <label for="n">Number of days to simulate:</label> 
+    <input type="number" id="n" name="n" value="7"><br> 
+    <label for="dose">Dose for each day (mg):</label><br>
+
+<input type="number" id="dose1" name="dose1" value="100"> Day 1<br>
+
+<input type="number" id="dose2" name="dose2" value="100"> Day 2<br>
+
+<input type="number" id="dose3" name="dose3" value="100"> Day 3<br>
+
+<input type="number" id="dose4" name="dose4" value="100"> Day 4<br>
+
+<input type="number" id="dose5" name="dose5" value="100"> Day 5<br>
+
+<input type="number" id="dose6" name="dose6" value="100"> Day 6<br>
+
+<input type="number" id="dose7" name="dose7" value="100"> Day 7<br>
+    <button type="button" onclick="calculate()">Calculate</button>
+  </form>
+  <div id="chart"></div>
+  <script>
+    function calculate() {
+      // Get the input values
+      var ctarget = parseFloat(document.getElementById("ctarget").value);
+      var cinitial = parseFloat(document.getElementById("cinitial").value);
+      var vd = parseFloat(document.getElementById("vd").value);
+      var f = parseFloat(document.getElementById("f").value);
+      var cl = parseFloat(document.getElementById("cl").value);
+      var ke = parseFloat(document.getElementById("ke").value);
+      var kt = parseFloat(document.getElementById("kt").value);
+      var n = parseFloat(document.getElementById("n").value);
+
+    var dose1 = parseFloat(document.getElementById("dose1").value);
+    var dose2 = parseFloat(document.getElementById("dose2").value);
+    var dose3 = parseFloat(document.getElementById("dose3").value);
+    var dose4 = parseFloat(document.getElementById("dose4").value);
+    var dose5 = parseFloat(document.getElementById("dose5").value);
+    var dose6 = parseFloat(document.getElementById("dose6").value);
+    var dose7 = parseFloat(document.getElementById("dose7").value);
+    // Calculate the dose
+      var dose = ((ctarget - cinitial) * vd / f) + (ctarget * cl / (ke - kt));
+
+      // Display the dose
+      alert("The dose is " + dose.toFixed(2) + " mg");
+
+      // Calculate the plasma concentration and tolerance over time
+      var t = []; // time array
+      var c = []; // concentration array
+      var r = []; // tolerance array
+      var ca = []; // concentration adjusted for tolerance
+      //var n = 7; // number of days - Removed this line
+      var dt = 0.01; // time step
+      for (var i = 0; i <= (n * 24) / dt; i++) {
+        t.push(i * dt); // time in hours
+        if (i % (24 / dt) == 0) {
+          // add the dose every 24 hours
+          cinitial += [dose1, dose2, dose3, dose4, dose5, dose6, dose7][Math.floor(i / (24 / dt))] / vd;
+        }
+        c.push(cinitial); // concentration in mg/L
+        r.push(Math.exp(-kt * t[i])); // tolerance factor
+        ca.push(cinitial * r[i]); // concentration adjusted for tolerance
+        cinitial -= ke * cinitial * dt; // update concentration
+      }
+
+      // Plot the chart
+      var trace1 = {
+        x: t,
+        y: c,
+        name: "Plasma concentration"
+      };
+      var trace2 = {
+        x: t,
+        y: r,
+        name: "Tolerance factor",
+        yaxis: "y2"
+      };
+      var trace3 = {
+        x: t,
+        y: ca,
+        name: "Concentration adjusted for tolerance"
+      };
+      var data = [trace1, trace2, trace3];
+      var layout = {
+        title: "Caffeine plasma concentration and tolerance over time",
+        xaxis: {
+          title: "Time (hours)"
+        },
+        yaxis: {
+          title: "Plasma concentration (mg/L)"
+        },
+        yaxis2: {
+          title: "Tolerance factor",
+          overlaying: "y",
+          side: "right"
+        }
+      };
+      Plotly.newPlot("chart", data, layout);
+    }
+  </script>
+</body>
+</html>
+
+
